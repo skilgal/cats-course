@@ -9,9 +9,6 @@ object Traversing {
   import cats.instances.list._
   import cats.instances.option._
 
-  println(Traverse[List].traverse(List(1, 2, 3))(number => Option(number)))
-  println(Traverse[List].sequence(List(Option(1), Option(2), None)))
-
   import cats.syntax.traverse._
   List(Option(1)).sequence
 
@@ -33,7 +30,7 @@ object Traversing {
     }
   }
 
-  def listTraverse[F[_]: Applicative, A, B](
+  def listTraverseApplicative[F[_]: Applicative, A, B](
       list: List[A]
   )(f: A => F[B]): F[List[B]] = {
     import cats.syntax.apply._
@@ -45,9 +42,25 @@ object Traversing {
     }
   }
 
+  import cats.syntax.apply._
 
-  def listSequence[F[_]: Applicative, A](list: List[F[A]]): F[List[A]] = {
-    ???
+  println {
+    (Option(List[Int](2)), Option(1)).mapN(_ :+ _)
   }
-  def main(args: Array[String]): Unit = {}
+
+  def listSequence[F[_]: Applicative, A](list: List[F[A]]): F[List[A]] =
+    listTraverseApplicative(list)(identity)
+
+  import cats.instances.vector._
+  val allPairs = listSequence(
+    List(Vector(1, 2), Vector(3, 4))
+  )
+  listSequence(
+    List(Vector(1, 2), Vector(3, 4), Vector(5, 6))
+  )
+
+  import cats.syntax.option._
+
+  def main(args: Array[String]): Unit = {
+  }
 }
